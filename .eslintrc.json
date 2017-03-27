@@ -16,6 +16,7 @@
     },
     "rules": {
         "indent": ["error", 4],
+        "arrow-body-style": "off",
         "no-multiple-empty-lines": ["warn", {"max": 3}],
         "comma-dangle": ["error", "never"],
         "padded-blocks": "off",
