@@ -1,0 +1,142 @@
+#!/usr/bin/env node
+
+const fs = require('fs');
+const path = require('path');
+
+const download = require('download-git-repo');
+const program = require('commander');
+const ora = require('ora');
+const semver = require('semver');
+const chalk = require('chalk');
+const inquirer = require('inquirer');
+
+const pkg = require('../package.json');
+const logger = require('../lib/logger');
+const generate = require('../lib/generator');
+
+if (semver.satisfies(process.version, pkg.engines.node) === false) {
+    logger.fatal(`Your current version of Node.js doesn't satisfy the minimun requirement: ${pkg.engines.node}`);
+    return;
+}
+
+/**
+ * Usage.
+ */
+
+program
+    .version(pkg.version)
+    .usage('<template> [folder-name]')
+    .option('--verbose', 'Verbose output', () => {
+        logger.setLevel(0);
+        return true;
+    })
+    .option('--log-level <n>', `Log levels: ${logger.asString()}`, parseInt);
+
+/**
+ * Help.
+ */
+
+program.on('--help', () => {
+    console.log('  Examples:');
+    console.log();
+    console.log(chalk.gray('    # create a barebone, no library project'));
+    console.log('    $ umeboshi create base my-project');
+    console.log();
+    console.log(chalk.gray('    # create a React project'));
+    console.log('    $ umeboshi create react my-project');
+    console.log();
+    console.log(chalk.gray('    # create a new project straight from a github template'));
+    console.log('    $ umeboshi create username/repo my-project');
+    console.log();
+});
+
+program.parse(process.argv);
+if (program.args.length < 2) {
+    return program.help();
+}
+
+if (!program.verbose && Number.isFinite(program.logLevel)) {
+    logger.setLevel(program.logLevel);
+}
+
+/**
+ * Settings.
+ */
+
+const template = program.args[0];
+const tmp = path.join(require('user-home'), '.umeboshi-cli', template.replace(/\//g, '-').replace(/#/g, '_'));
+const [match, templateName = 'base', version = 'master'] = template.match(/^([^#]+)#?(master|[0-9.]+|)$/) || [];
+const hasSlash = templateName.indexOf('/') > -1;
+const rawName = program.args[1];
+const inPlace = !rawName || rawName === '.';
+const name = inPlace ? path.relative('../', process.cwd()) : rawName;
+const to = path.resolve(rawName || '.');
+
+if (fs.existsSync(to)) {
+    logger.fatal(`path "${to}" already exists`);
+    return;
+}
+
+inquirer.prompt([
+    {
+        type: 'input',
+        name: 'name',
+        message: 'Project name (lowercase letters, numbers and -)',
+        default: name,
+        validate: (input) => /^[a-z][0-9a-z\-]+$/.test(input) === true
+    },
+    {
+        type: 'input',
+        name: 'description',
+        message: 'Project Description',
+        validate: (input) => input.length > 0
+    },
+    {
+        type: 'input',
+        name: 'author',
+        message: 'Project Author'
+    }
+]).then((answers) => {
+
+    const options = generate(Object.assign({
+        version,
+        templateName,
+        to,
+        fullName: answers.name.replace(/(^[a-z]|-[a-z])/ig, (match) => match.toUpperCase()).replace('-', ' '),
+        hasSlash,
+        src: path.join(__dirname, '..')
+    }), answers);
+
+
+    const completed = (err) => {
+        if (err) {
+            logger.fatal(`Scaffoling failed: ${err.message.trim()}`);
+            return;
+        }
+        logger.message('Scaffolding completed!\n');
+        logger.log('Next Steps:\n');
+        logger.log('1) install dependencies: yarn install');
+        logger.log('2) launch development env: yarn start');
+    };
+
+    generate(options, () => {
+        if (templateName !== 'base') {
+            const templatePath =  hasSlash ? template : `dwightjack/umeboshi-${templateName}#${version}`;
+
+            const spinner = ora('downloading template');
+            spinner.start();
+
+            download(templatePath, tmp, { clone: false }, (err) => {
+                spinner.stop();
+                if (err) {
+                    logger.fatal(`Failed to download template ${templatePath}: ${err.message.trim()}`);
+                }
+                generate(Object.assign({
+                    src: tmp
+                }, options), completed);
+            });
+            return;
+        }
+        completed();
+    });
+});
