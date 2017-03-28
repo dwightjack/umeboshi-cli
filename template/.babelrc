@@ -1,0 +1,34 @@
+{
+    "presets": [
+        ["es2015", {"loose": true, "modules": false}]{{#if templateName == 'react'}},
+        "react"
+        {{/if}}
+    ],
+
+    "env": {
+        "development": {
+            "plugins" : [
+                "transform-object-rest-spread",
+                ["transform-runtime", {"polyfill": false, "regenerator": false }]
+            ]
+        },
+        "production": {
+            "plugins": [
+                "transform-object-rest-spread",
+                {{#if templateName == 'react'}}
+                "transform-react-remove-prop-types",
+                "transform-react-constant-elements",
+                "transform-react-inline-elements",
+                {{/if}}
+                ["transform-runtime", {"polyfill": false, "regenerator": false }]
+            ]
+        },
+        "test": {
+            "plugins": [
+                "transform-es2015-modules-commonjs",
+                "transform-object-rest-spread",
+                ["transform-runtime", {"polyfill": false, "regenerator": false }]
+            ]
+        }
+    }
+}
