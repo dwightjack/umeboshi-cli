@@ -3,10 +3,10 @@
 > {{description}}
 
 ## Features
-{{#if templateName == 'react'}}
+{{#if_eq templateName 'react'}}
 * [React](https://facebook.github.io/react/) and [Webpack 2](https://webpack.js.org/) with HMR 
 * ES6+ and JSX with [Babel](https://babeljs.io/)
-{{/if}}
+{{/if_eq}}
 * Unit test with [Jest](https://facebook.github.io/jest/) and [Enzyme](http://airbnb.io/enzyme/)
 * CSS and JS linting with [ESLint](http://eslint.org/) (airbnb preset) and [Stylelint](https://stylelint.io/)
 * [Sass](http://sass-lang.com/) with [node-sass](https://github.com/sass/node-sass) 

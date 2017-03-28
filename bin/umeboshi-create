@@ -13,6 +13,7 @@ const inquirer = require('inquirer');
 const pkg = require('../package.json');
 const logger = require('../lib/logger');
 const generate = require('../lib/generator');
+const objectToString = require('../lib/utils').objectToString;
 
 if (semver.satisfies(process.version, pkg.engines.node) === false) {
     logger.fatal(`Your current version of Node.js doesn't satisfy the minimun requirement: ${pkg.engines.node}`);
@@ -26,10 +27,7 @@ if (semver.satisfies(process.version, pkg.engines.node) === false) {
 program
     .version(pkg.version)
     .usage('<template> [folder-name]')
-    .option('--verbose', 'Verbose output', () => {
-        logger.setLevel(0);
-        return true;
-    })
+    .option('--verbose', 'Verbose output')
     .option('--log-level <n>', `Log levels: ${logger.asString()}`, parseInt);
 
 /**
@@ -57,7 +55,12 @@ if (program.args.length < 2) {
 
 if (!program.verbose && Number.isFinite(program.logLevel)) {
     logger.setLevel(program.logLevel);
+} else if (program.verbose) {
+    logger.setLevel(0);
 }
+
+logger.verbose(`Program started with arguments: ${program.args.join(', ')}`);
+
 
 /**
  * Settings.
@@ -72,10 +75,12 @@ const inPlace = !rawName || rawName === '.';
 const name = inPlace ? path.relative('../', process.cwd()) : rawName;
 const to = path.resolve(rawName || '.');
 
-if (fs.existsSync(to)) {
-    logger.fatal(`path "${to}" already exists`);
+if (fs.existsSync(to) && fs.readdirSync(to).length > 0) {
+    logger.fatal(`path "${to}" already exists and is not empty`);
     return;
 }
+
+logger.verbose(`Path "${to}" is a valid path`);
 
 inquirer.prompt([
     {
@@ -98,14 +103,16 @@ inquirer.prompt([
     }
 ]).then((answers) => {
 
-    const options = generate(Object.assign({
+    logger.verbose(`Answers - ${objectToString(answers)}`);
+
+    const options = Object.assign({
         version,
         templateName,
         to,
         fullName: answers.name.replace(/(^[a-z]|-[a-z])/ig, (match) => match.toUpperCase()).replace('-', ' '),
         hasSlash,
         src: path.join(__dirname, '..')
-    }), answers);
+    }, answers);
 
 
     const completed = (err) => {
@@ -115,11 +122,15 @@ inquirer.prompt([
         }
         logger.message('Scaffolding completed!\n');
         logger.log('Next Steps:\n');
-        logger.log('1) install dependencies: yarn install');
-        logger.log('2) launch development env: yarn start');
+        if (!inPlace) {
+            logger.log(`- cd into the project folder: cd ${rawName}`);
+        }
+        logger.log('- install dependencies: yarn install');
+        logger.log('- launch development env: yarn start\n');
     };
 
     generate(options, () => {
+        logger.verbose('Generating base template...');
         if (templateName !== 'base') {
             const templatePath =  hasSlash ? template : `dwightjack/umeboshi-${templateName}#${version}`;
 

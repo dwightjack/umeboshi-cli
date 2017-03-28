@@ -25,6 +25,7 @@
     "commander": "2.9.0",
     "consolidate": "0.14.5",
     "download-git-repo": "0.2.1",
+    "handlebars": "4.0.6",
     "inquirer": "3.0.6",
     "metalsmith": "2.3.0",
     "ora": "1.2.0",

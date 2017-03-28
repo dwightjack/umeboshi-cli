@@ -13,7 +13,7 @@ const config = merge.smart({
     entry: {
         app: [
             'eventsource-polyfill', // Necessary for hot reloading with IE
-            'react-hot-loader/patch',
+            {{#if_eq templateName 'react'}}'react-hot-loader/patch',{{/if_eq}}
             'webpack-dev-server/client?http://' + address + ':' + localhost.port,
             'webpack/hot/only-dev-server'
         ]

@@ -1,8 +1,8 @@
 {
     "presets": [
-        ["es2015", {"loose": true, "modules": false}]{{#if templateName == 'react'}},
+        ["es2015", {"loose": true, "modules": false}]{{#if_eq templateName 'react'}},
         "react"
-        {{/if}}
+        {{/if_eq}}
     ],
 
     "env": {
@@ -15,11 +15,11 @@
         "production": {
             "plugins": [
                 "transform-object-rest-spread",
-                {{#if templateName == 'react'}}
+                {{#if_eq templateName 'react'}}
                 "transform-react-remove-prop-types",
                 "transform-react-constant-elements",
                 "transform-react-inline-elements",
-                {{/if}}
+                {{/if_eq}}
                 ["transform-runtime", {"polyfill": false, "regenerator": false }]
             ]
         },
