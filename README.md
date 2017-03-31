@@ -32,6 +32,28 @@ $ umeboshi create base my-project-folder
 Available project templates:
 
 * Base (included in umeboshi-cli)
-* React (WIP)
+* [React](https://github.com/dwightjack/umeboshi-react) (WIP)
 * Vue (WIP)
+
+## Scripts
+
+Either use `npm run <script>` or `yarn run <script>`
+
+* `start`: start development mode
+* `server`: run a static web server
+* `test`: run jest
+* `build`: generate a development build (will also lint files)
+* `build:production`: generate a production build
+* `eslint`: lint JS files
+* `stylelint`: lint SCSS/CSS files
+* `lint`: lint both styles and JS files
+
+
+## Development 
+
+To run the project in development mode (uses [webpack dev server](https://webpack.js.org/configuration/dev-server/)) run:
+
+```
+yarn start
+```
 
