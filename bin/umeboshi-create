@@ -132,7 +132,7 @@ inquirer.prompt([
     generate(options, () => {
         logger.verbose('Generating base template...');
         if (templateName !== 'base') {
-            const templatePath =  hasSlash ? template : `dwightjack/umeboshi-${templateName}#${version}`;
+            const templatePath =  hasSlash ? template : `github:dwightjack/umeboshi-${templateName}#${version || 'master'}`;
 
             const spinner = ora('downloading template');
             spinner.start();
@@ -142,9 +142,9 @@ inquirer.prompt([
                 if (err) {
                     logger.fatal(`Failed to download template ${templatePath}: ${err.message.trim()}`);
                 }
-                generate(Object.assign({
+                generate(Object.assign({}, options, {
                     src: tmp
-                }, options), completed);
+                }), completed);
             });
             return;
         }
