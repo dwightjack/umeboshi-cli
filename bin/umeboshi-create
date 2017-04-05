@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 const download = require('download-git-repo');
+const async = require('async');
 const program = require('commander');
 const ora = require('ora');
 const semver = require('semver');
@@ -14,6 +15,7 @@ const pkg = require('../package.json');
 const logger = require('../lib/logger');
 const generate = require('../lib/generator');
 const objectToString = require('../lib/utils').objectToString;
+const tmpDir = require('../lib/utils').tmpDir;
 
 if (semver.satisfies(process.version, pkg.engines.node) === false) {
     logger.fatal(`Your current version of Node.js doesn't satisfy the minimun requirement: ${pkg.engines.node}`);
@@ -110,8 +112,7 @@ inquirer.prompt([
         templateName,
         to,
         fullName: answers.name.replace(/(^[a-z]|-[a-z])/ig, (match) => match.toUpperCase()).replace('-', ' '),
-        hasSlash,
-        src: path.join(__dirname, '..')
+        hasSlash
     }, answers);
 
 
@@ -129,25 +130,47 @@ inquirer.prompt([
         logger.log('- launch development env: yarn start\n');
     };
 
-    generate(options, () => {
-        logger.verbose('Generating base template...');
-        if (templateName !== 'base') {
-            const templatePath =  hasSlash ? template : `github:dwightjack/umeboshi-${templateName}#${version || 'master'}`;
 
-            const spinner = ora('downloading template');
+    if (hasSlash) {
+        //custom template
+    } else {
+
+        const templates = [];
+
+        if (templateName !== 'base') {
+            templates.push('github:dwightjack/umeboshi-base#master');
+        }
+
+        templates.push(`github:dwightjack/umeboshi-${templateName}#${version || 'master'}`);
+
+        async.reduce(templates, {}, (memo, tmplUrl, callback) => {
+
+            const tmpFolder = tmpDir(tmplUrl);
+
+            const spinner = ora(`downloading template "${tmplUrl}"`);
             spinner.start();
 
-            download(templatePath, tmp, { clone: false }, (err) => {
-                spinner.stop();
+            download(tmplUrl, tmpFolder, { clone: false }, (err) => {
+
                 if (err) {
-                    logger.fatal(`Failed to download template ${templatePath}: ${err.message.trim()}`);
+                    spinner.fail();
+                    logger.fatal(`Failed to download template ${tmplUrl}: ${err.message.trim()}`);
+                    callback(err);
+                    return;
                 }
+                spinner.succeed();
+
+                logger.verbose('Generating template files...');
+
                 generate(Object.assign({}, options, {
-                    src: tmp
-                }), completed);
+                    src: tmpFolder,
+                    files: memo
+                }), (err, files) => {
+                    callback(err, Object.assign(memo, files));
+                });
+
             });
-            return;
-        }
-        completed();
-    });
+
+        }, completed);
+    }
 });

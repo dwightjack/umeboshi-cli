@@ -31,7 +31,7 @@ $ umeboshi create base my-project-folder
 
 Available project templates:
 
-* Base (included in umeboshi-cli)
+* [Base](https://github.com/dwightjack/umeboshi-base)
 * [React](https://github.com/dwightjack/umeboshi-react) (WIP)
 * Vue (WIP)
 
