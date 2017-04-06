@@ -31,6 +31,7 @@
     "lodash": "4.17.4",
     "metalsmith": "2.3.0",
     "ora": "1.2.0",
+    "rimraf": "^2.6.1",
     "semver": "5.3.0",
     "user-home": "2.0.0"
   }
