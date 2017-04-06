@@ -4,4 +4,5 @@ require('commander')
     .version(require('../package').version)
     .usage('<command> [options]')
     .command('create', 'generate a new project')
+    .command('clean', 'cleanups umeboshi temporary files')
     .parse(process.argv);

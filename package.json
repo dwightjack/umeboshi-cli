@@ -9,7 +9,8 @@
   "preferGlobal": true,
   "bin": {
     "umeboshi": "bin/umeboshi",
-    "umeboshi-create": "bin/umeboshi-create"
+    "umeboshi-create": "bin/umeboshi-create",
+    "umeboshi-clean": "bin/umeboshi-clean"
   },
   "engines": {
     "node": "^6.9.0"
