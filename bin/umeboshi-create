@@ -3,6 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 
+const _ = require('lodash');
 const download = require('download-git-repo');
 const async = require('async');
 const program = require('commander');
@@ -10,6 +11,8 @@ const ora = require('ora');
 const semver = require('semver');
 const chalk = require('chalk');
 const inquirer = require('inquirer');
+const merge = require('lodash/merge');
+const result = require('lodash/result');
 
 const pkg = require('../package.json');
 const logger = require('../lib/logger');
@@ -112,7 +115,8 @@ inquirer.prompt([
         templateName,
         to,
         fullName: answers.name.replace(/(^[a-z]|-[a-z])/ig, (match) => match.toUpperCase()).replace('-', ' '),
-        hasSlash
+        hasSlash,
+        tmpl: { hmr: false }
     }, answers);
 
 
@@ -143,9 +147,9 @@ inquirer.prompt([
 
         templates.push(`github:dwightjack/umeboshi-${templateName}#${version || 'master'}`);
 
-        async.reduce(templates, {}, (memo, tmplUrl, callback) => {
+        const tmpFolder = tmpDir(`${_.last(templates)}-${Date.now()}`);
 
-            const tmpFolder = tmpDir(tmplUrl);
+        async.eachSeries(templates, (tmplUrl, callback) => {
 
             const spinner = ora(`downloading template "${tmplUrl}"`);
             spinner.start();
@@ -159,18 +163,22 @@ inquirer.prompt([
                     return;
                 }
                 spinner.succeed();
-
-                logger.verbose('Generating template files...');
-
-                generate(Object.assign({}, options, {
-                    src: tmpFolder,
-                    files: memo
-                }), (err, files) => {
-                    callback(err, Object.assign(memo, files));
-                });
+                callback(err);
 
             });
 
-        }, completed);
+        }, (err) => {
+            if (err) {
+                completed(err);
+                return;
+            }
+
+            logger.verbose('Generating template files...');
+
+            generate(Object.assign({}, options, {
+                src: tmpFolder
+            }), completed);
+
+        });
     }
 });
