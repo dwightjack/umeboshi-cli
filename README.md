@@ -1,4 +1,4 @@
-# Umeboshi (WIP)
+# Umeboshi
 
 > lean Webpack Template for SPA applications, inspired by [vue-cli](https://github.com/vuejs/vue-cli)
 
@@ -32,8 +32,8 @@ $ umeboshi create base my-project-folder
 Available project templates:
 
 * [Base](https://github.com/dwightjack/umeboshi-base)
-* [React](https://github.com/dwightjack/umeboshi-react) (WIP)
-* Vue (WIP)
+* [React](https://github.com/dwightjack/umeboshi-react)
+* [Vue.js](https://github.com/dwightjack/umeboshi-vue)
 
 ## Scripts
 
