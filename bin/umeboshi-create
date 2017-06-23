@@ -73,7 +73,7 @@ logger.verbose(`Program started with arguments: ${program.args.join(', ')}`);
 
 const template = program.args[0];
 const tmp = path.join(require('user-home'), '.umeboshi-cli', template.replace(/\//g, '-').replace(/#/g, '_'));
-const [match, templateName = 'base', version = 'master'] = template.match(/^([^#]+)#?(master|[0-9.]+|)$/) || [];
+const [match, templateName = 'base', version = 'master'] = template.match(/^([^#]+)#?(master|develop|[0-9.]+|)$/) || [];
 const hasSlash = templateName.indexOf('/') > -1;
 const rawName = program.args[1];
 const inPlace = !rawName || rawName === '.';
