@@ -4,5 +4,6 @@ require('commander')
     .version(require('../package').version)
     .usage('<command> [options]')
     .command('create', 'generate a new project')
-    .command('clean', 'cleanups umeboshi temporary files')
+    .command('clean', 'cleanup umeboshi temporary files')
+    .command('scaffold', 'generate folders and files based on a template')
     .parse(process.argv);

@@ -31,7 +31,7 @@ if (semver.satisfies(process.version, pkg.engines.node) === false) {
 
 program
     .version(pkg.version)
-    .usage('<template> [folder-name]')
+    .usage('<template> [options]')
     .option('--verbose', 'Verbose output')
     .option('--log-level <n>', `Log levels: ${logger.asString()}`, parseInt);
 
