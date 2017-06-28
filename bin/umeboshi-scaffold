@@ -10,6 +10,7 @@ const inquirer = require('inquirer');
 
 const pkg = require('../package.json');
 const logger = require('../lib/logger');
+const generate = require('../lib/generator');
 
 if (semver.satisfies(process.version, pkg.engines.node) === false) {
     logger.fatal(`Your current version of Node.js doesn't satisfy the minimun requirement: ${pkg.engines.node}`);
@@ -79,12 +80,30 @@ if (!workingFolder) {
 logger.verbose(`Template "${template}" resolved as "${workingFolder}"`);
 
 try {
-    const { prompts, command } = require(workingFolder);
+    const templateIndex = path.join(workingFolder, 'index.js');
+    const customizer = fs.existsSync(templateIndex) ? require(templateIndex) : {};
+    const { prompts = () => [] } = customizer;
+
+    const completed = (err) => {
+        if (err) {
+            logger.fatal(`Scaffolding failed: ${err.message.trim()}`);
+            return;
+        }
+        logger.message('Scaffolding completed!\n');
+    };
 
     inquirer
         .prompt(prompts({ program, namespace, folder }))
         .then((answers) => {
-
+            if (!answers.to) {
+                completed(new Error('You must provide a "to" path string as file destination folder'))
+                return;
+            }
+            answers.to = path.resolve(process.cwd(), answers.to);
+            logger.verbose(`Running with options "${JSON.stringify(answers)}`);
+            generate(Object.assign({}, answers, {
+                src: workingFolder
+            }), completed);
         });
 } catch (e) {
     logger.fatal(e);
