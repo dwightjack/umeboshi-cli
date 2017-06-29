@@ -72,9 +72,9 @@ logger.verbose(`Program started with arguments: ${program.args.join(', ')}`);
  */
 
 const template = program.args[0];
-const tmp = path.join(require('user-home'), '.umeboshi-cli', template.replace(/\//g, '-').replace(/#/g, '_'));
 const [match, templateName = 'base', version = 'master'] = template.match(/^([^#]+)#?(master|develop|[0-9.]+|)$/) || [];
 const hasSlash = templateName.indexOf('/') > -1;
+const isLocal = /^(\.|\/)/.test(template);
 const rawName = program.args[1];
 const inPlace = !rawName || rawName === '.';
 const name = inPlace ? path.relative('../', process.cwd()) : rawName;
@@ -135,21 +135,37 @@ inquirer.prompt([
     };
 
 
-    if (hasSlash) {
-        //custom template
-    } else {
+    if (isLocal) {
 
-        const templates = [];
+        if (fs.existsSync(template)) {
+            logger.verbose('Generating template files...');
+
+            generate(Object.assign({}, options, {
+                src: template
+            }), completed);
+            return;
+        }
+
+        logger.fatal(`Local folder ${template} not found`);
+        return;
+    }
+
+    const templates = [];
+
+    if (hasSlash) {
+        templates.push(`github:${templateName}#${version || 'master'}`);
+    } else {
 
         if (templateName !== 'base') {
             templates.push('github:dwightjack/umeboshi-base#master');
         }
 
         templates.push(`github:dwightjack/umeboshi-${templateName}#${version || 'master'}`);
+    }
 
-        const tmpFolder = tmpDir(`${_.last(templates)}-${Date.now()}`);
+    const tmpFolder = tmpDir(`${_.last(templates)}-${Date.now()}`);
 
-        async.eachSeries(templates, (tmplUrl, callback) => {
+    async.eachSeries(templates, (tmplUrl, callback) => {
 
             const spinner = ora(`downloading template "${tmplUrl}"`);
             spinner.start();
@@ -163,7 +179,7 @@ inquirer.prompt([
                     return;
                 }
                 spinner.succeed();
-                callback(err);
+                callback();
 
             });
 
@@ -180,5 +196,4 @@ inquirer.prompt([
             }), completed);
 
         });
-    }
 });
