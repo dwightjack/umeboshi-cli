@@ -1,6 +1,6 @@
-# Umeboshi
+# umeboshi-cli
 
-> lean Webpack Template for SPA applications, inspired by [vue-cli](https://github.com/vuejs/vue-cli)
+> simple project sacaffolding for SPA applications, inspired by [vue-cli](https://github.com/vuejs/vue-cli)
 
 ## Requirements
 
@@ -17,17 +17,50 @@ $ npm install -g umeboshi-cli
 
 ## Usage
 
-```
-$ umeboshi create <template> <project-folder>
+Once installed umeboshi-cli commands are available through the `umeboshi` or `ume` executable.
+
+**Available commands are:**
+
+* `create`: scaffolds a new project based on a remote template
+* `scaffold`: scaffolds project's folders and files based on templates
+* `clean`: deletes locally stored project templates
+
+### `create`
+
+This command scaffolds a new project based on a remote template. The target folder must be empty.
+
+```sh
+$ umeboshi create <template> <project-folder|.>
 ```
 
-Example: 
+Example:
 
-```
+```sh
 $ umeboshi create base my-project-folder
+
+# use the current folder as project root
+$ umeboshi create base .
 ```
 
-### Project Templates
+_More docs to come..._
+
+### `scaffold`
+
+This command scaffolds project's folders and files based on templates.
+
+```sh
+$ umeboshi scaffold <namespace>[/<template-name>]
+```
+
+Example:
+
+```sh
+$ umeboshi scaffold react/stateless
+```
+
+Learn more about `scaffold` [here](docs/scaffold.md)
+
+## Official Project Templates
 
 Available project templates:
 
@@ -35,25 +68,8 @@ Available project templates:
 * [React](https://github.com/dwightjack/umeboshi-react)
 * [Vue.js](https://github.com/dwightjack/umeboshi-vue)
 
-## Scripts
+## License
 
-Either use `npm run <script>` or `yarn run <script>`
+[MIT](http://opensource.org/licenses/MIT)
 
-* `start`: start development mode
-* `server`: run a static web server
-* `test`: run jest
-* `build`: generate a development build (will also lint files)
-* `build:production`: generate a production build
-* `eslint`: lint JS files
-* `stylelint`: lint SCSS/CSS files
-* `lint`: lint both styles and JS files
-
-
-## Development 
-
-To run the project in development mode (uses [webpack dev server](https://webpack.js.org/configuration/dev-server/)) run:
-
-```
-yarn start
-```
-
+Copyright (c) 2016 Marco Solazzi
