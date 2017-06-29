@@ -42,34 +42,28 @@ $ umeboshi create base my-project-folder
 $ umeboshi create base .
 ```
 
+_More docs to come..._
+
 ### `scaffold`
 
 This command scaffolds project's folders and files based on templates.
 
-Project's templates are stored locally. Search order is:
-
-* `scaffold` folder in the project root
-* `umeboshi-scaffold-<templatename>` local npm module
-
 ```sh
-$ umeboshi create <template> <project-folder|.>
+$ umeboshi scaffold <namespace>[/<template-name>]
 ```
 
 Example:
 
 ```sh
-$ umeboshi create base my-project-folder
-
-# use the current folder as project root
-$ umeboshi create base .
+$ umeboshi scaffold react/stateless
 ```
 
-#### Official Project Templates
+Learn more about `scaffold` [here](docs/scaffold.md)
+
+## Official Project Templates
 
 Available project templates:
 
 * [Base](https://github.com/dwightjack/umeboshi-base)
 * [React](https://github.com/dwightjack/umeboshi-react)
 * [Vue.js](https://github.com/dwightjack/umeboshi-vue)
-
-### `create`
