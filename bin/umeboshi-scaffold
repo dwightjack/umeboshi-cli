@@ -55,8 +55,8 @@ if (!program.verbose && Number.isFinite(program.logLevel)) {
 
 logger.verbose(`Program started with arguments: ${program.args.join(', ')}`);
 
-const template = program.args[0];
-const [match, namespace, folder = ''] = template.match(/^([^/]+)(?:\/([^/]+)|)$/) || [];
+const input = program.args[0];
+const [match, namespace, template = ''] = input.match(/^([^/]+)(?:\/([^/]+)|)$/) || [];
 
 if (!namespace) {
     logger.fatal(`invalid namespace "${namespace}"`);
@@ -64,8 +64,8 @@ if (!namespace) {
 }
 
 const folderList = [
-    path.join(process.cwd(), 'scaffold', namespace, folder),
-    path.join(process.cwd(), 'node_modules', `umeboshi-scaffold-${namespace}`, folder)
+    path.join(process.cwd(), 'scaffold', namespace, template),
+    path.join(process.cwd(), 'node_modules', `umeboshi-scaffold-${namespace}`, template)
 ]
 
 logger.verbose(`Looking for template in: ${folderList.join(', ')}`);
@@ -73,11 +73,11 @@ logger.verbose(`Looking for template in: ${folderList.join(', ')}`);
 const workingFolder = folderList.find(fs.existsSync);
 
 if (!workingFolder) {
-    logger.fatal(`Template "${template}" not found`);
+    logger.fatal(`Template "${input}" not found`);
     return;
 }
 
-logger.verbose(`Template "${template}" resolved as "${workingFolder}"`);
+logger.verbose(`Template "${input}" resolved as "${workingFolder}"`);
 
 try {
     const templateIndex = path.join(workingFolder, 'index.js');
@@ -93,7 +93,7 @@ try {
     };
 
     inquirer
-        .prompt(prompts({ program, namespace, folder }))
+        .prompt(prompts({ program, namespace, template }))
         .then((answers) => {
             if (!answers.to) {
                 completed(new Error('You must provide a "to" path string as file destination folder'))
