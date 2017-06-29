@@ -67,3 +67,9 @@ Available project templates:
 * [Base](https://github.com/dwightjack/umeboshi-base)
 * [React](https://github.com/dwightjack/umeboshi-react)
 * [Vue.js](https://github.com/dwightjack/umeboshi-vue)
+
+## License
+
+[MIT](http://opensource.org/licenses/MIT)
+
+Copyright (c) 2016 Marco Solazzi
