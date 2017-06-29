@@ -74,7 +74,7 @@ logger.verbose(`Program started with arguments: ${program.args.join(', ')}`);
 const template = program.args[0];
 const [match, templateName = 'base', version = 'master'] = template.match(/^([^#]+)#?(master|develop|[0-9.]+|)$/) || [];
 const hasSlash = templateName.indexOf('/') > -1;
-const isLocal = /^(\.\/|\/)/.test(template);
+const isLocal = /^(\.|\/)/.test(template);
 const rawName = program.args[1];
 const inPlace = !rawName || rawName === '.';
 const name = inPlace ? path.relative('../', process.cwd()) : rawName;
@@ -145,6 +145,9 @@ inquirer.prompt([
             }), completed);
             return;
         }
+
+        logger.fatal(`Local folder ${template} not found`);
+        return;
     }
 
     const templates = [];
