@@ -191,7 +191,7 @@ inquirer.prompt([
 
             logger.verbose('Generating template files...');
 
-            generate(Object.assign({}, options, {
+            generate(Object.assign({ command: 'create' }, options, {
                 src: tmpFolder
             }), completed);
 

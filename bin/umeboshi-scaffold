@@ -66,7 +66,7 @@ if (!namespace) {
 const folderList = [
     path.join(process.cwd(), 'scaffold', namespace, template),
     path.join(process.cwd(), 'node_modules', `umeboshi-scaffold-${namespace}`, template)
-]
+];
 
 logger.verbose(`Looking for template in: ${folderList.join(', ')}`);
 
@@ -101,7 +101,7 @@ try {
             }
             answers.to = path.resolve(process.cwd(), answers.to);
             logger.verbose(`Running with options "${JSON.stringify(answers)}`);
-            generate(Object.assign({}, answers, {
+            generate(Object.assign({ command: 'scaffold' }, answers, {
                 src: workingFolder
             }), completed);
         });
