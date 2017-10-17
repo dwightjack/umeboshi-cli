@@ -9,14 +9,11 @@ const ora = require('ora');
 const semver = require('semver');
 const chalk = require('chalk');
 const inquirer = require('inquirer');
-const merge = require('lodash/merge');
-const result = require('lodash/result');
-const request = require('request');
 
 const pkg = require('../package.json');
 const logger = require('../lib/logger');
 const generate = require('../lib/generator');
-const { tmpDir, getLatestTag, objectToString, resolveRepoUrl } = require('../lib/utils');
+const { tmpDir, objectToString, resolveRepoUrl } = require('../lib/utils');
 
 if (semver.satisfies(process.version, pkg.engines.node) === false) {
     logger.fatal(`[create] Your current version of Node.js doesn't satisfy the minimun requirement: ${pkg.engines.node}`);
@@ -53,7 +50,8 @@ program.on('--help', () => {
 
 program.parse(process.argv);
 if (program.args.length < 2) {
-    return program.help();
+    program.help();
+    process.exit();
 }
 
 if (!program.verbose && Number.isFinite(program.logLevel)) {
@@ -70,7 +68,7 @@ logger.verbose(`[create] Program started with arguments: ${program.args.join(', 
  */
 
 const template = program.args[0];
-const [match, templateName = 'base', version] = template.match(/^([^#]+)#?(master|develop|[0-9.]+|)$/) || [];
+const [, templateName = 'base', version] = template.match(/^([^#]+)#?(master|develop|[0-9.]+|)$/) || [];
 const hasSlash = templateName.indexOf('/') > -1;
 const isLocal = /^(\.|\/)/.test(template);
 const rawName = program.args[1];
@@ -94,18 +92,13 @@ const completed = (err) => {
 
 if (fs.existsSync(to) && fs.readdirSync(to).length > 0) {
     logger.fatal(`[create] path "${to}" already exists and is not empty`);
-    return;
 }
-
-const resolveTemplate
-
-
 
 const resolveTemplates = (options = {}) => {
     const {
-        version,
-        templateName,
-        hasSlash
+        version, //eslint-disable-line no-shadow
+        templateName, //eslint-disable-line no-shadow
+        hasSlash //eslint-disable-line no-shadow
     } = options;
 
     if (hasSlash) {
@@ -116,12 +109,12 @@ const resolveTemplates = (options = {}) => {
 
     if (templateName !== 'base') {
         promises.push(
-            resolveRepoUrl('dwightjack/umeboshi-base');
+            resolveRepoUrl('dwightjack/umeboshi-base')
         );
     }
 
     promises.push(
-        resolveRepoUrl(`dwightjack/umeboshi-${templateName}`, version);
+        resolveRepoUrl(`dwightjack/umeboshi-${templateName}`, version)
     );
 
     return Promise.all(promises);
@@ -135,7 +128,7 @@ inquirer.prompt([
         name: 'name',
         message: 'Project name (lowercase letters, numbers and -)',
         default: name,
-        validate: (input) => /^[a-z][0-9a-z\-]+$/.test(input) === true
+        validate: (input) => /^[a-z][0-9a-z-]+$/.test(input) === true
     },
     {
         type: 'input',
@@ -196,37 +189,38 @@ inquirer.prompt([
 
     const tmpFolder = tmpDir(`${_.last(templates).replace(/[#.]+/g, '')}-${Date.now()}`);
 
-        async.eachSeries(templates, (tmplUrl, next) => {
+    async.eachSeries(templates, (tmplUrl, next) => {
 
-            const spinner = ora(`downloading template "${tmplUrl}"`);
-            spinner.start();
+        const spinner = ora(`downloading template "${tmplUrl}"`);
+        spinner.start();
 
-            download(tmplUrl, tmpFolder, { clone: false }, (err) => {
+        download(tmplUrl, tmpFolder, { clone: false }, (err) => {
 
-                if (err) {
-                    spinner.fail();
-                    logger.fatal(`[create] Failed to download template ${tmplUrl}: ${err.message.trim()}`);
-                    next(err);
-                    return;
-                }
-                spinner.succeed();
-                next();
-
-            });
-
-        }, (err) => {
             if (err) {
-                completed(err);
+                spinner.fail();
+                logger.fatal(`[create] Failed to download template ${tmplUrl}: ${err.message.trim()}`);
+                next(err);
                 return;
             }
-
-            logger.verbose('[create] Generating template files...');
-
-            generate(Object.assign({ command: 'create' }, options, {
-                src: tmpFolder
-            }), completed);
+            spinner.succeed();
+            next();
 
         });
+
+    }, (err) => {
+        if (err) {
+            completed(err);
+            return;
+        }
+
+        logger.verbose('[create] Generating template files...');
+
+        generate(Object.assign({ command: 'create' }, options, {
+            src: tmpFolder
+        }), completed);
+
+    });
+
 }).catch((...args) => {
     logger.fatal(args);
 });

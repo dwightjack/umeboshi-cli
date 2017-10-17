@@ -12,7 +12,6 @@ const generate = require('../lib/generator');
 
 if (semver.satisfies(process.version, pkg.engines.node) === false) {
     logger.fatal(`[scaffold] Your current version of Node.js doesn't satisfy the minimun requirement: ${pkg.engines.node}`);
-    return;
 }
 
 /**
@@ -42,7 +41,8 @@ program.on('--help', () => {
 
 program.parse(process.argv);
 if (program.args.length < 1) {
-    return program.help();
+    program.help();
+    process.exit();
 }
 
 if (!program.verbose && Number.isFinite(program.logLevel)) {
@@ -54,11 +54,10 @@ if (!program.verbose && Number.isFinite(program.logLevel)) {
 logger.verbose(`[scaffold] Program started with arguments: ${program.args.join(', ')}`);
 
 const input = program.args[0];
-const [match, namespace, template = ''] = input.match(/^([^/]+)(?:\/([^/]+)|)$/) || [];
+const [, namespace, template = ''] = input.match(/^([^/]+)(?:\/([^/]+)|)$/) || [];
 
 if (!namespace) {
     logger.fatal(`[scaffold] Invalid namespace "${namespace}"`);
-    return;
 }
 
 const folderList = [
@@ -72,7 +71,6 @@ const workingFolder = folderList.find(fs.existsSync);
 
 if (!workingFolder) {
     logger.fatal(`[scaffold] Template "${input}" not found`);
-    return;
 }
 
 logger.verbose(`[scaffold] Template "${input}" resolved as "${workingFolder}"`);
@@ -94,10 +92,10 @@ try {
         .prompt(prompts({ program, namespace, template }))
         .then((answers) => {
             if (!answers.to) {
-                completed(new Error('You must provide a "to" path string as file destination folder'))
+                completed(new Error('You must provide a "to" path string as file destination folder'));
                 return;
             }
-            answers.to = path.resolve(process.cwd(), answers.to);
+            answers.to = path.resolve(process.cwd(), answers.to); //eslint-disable-line no-param-reassign
             logger.verbose(`[scaffold] Running with options "${JSON.stringify(answers)}`);
             generate(Object.assign({ command: 'scaffold' }, answers, {
                 src: workingFolder
