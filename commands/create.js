@@ -11,16 +11,16 @@ const chalk = require('chalk');
 const inquirer = require('inquirer');
 const merge = require('lodash/merge');
 const result = require('lodash/result');
+const request = require('request');
 
 const pkg = require('../package.json');
 const logger = require('../lib/logger');
 const generate = require('../lib/generator');
-const objectToString = require('../lib/utils').objectToString;
-const tmpDir = require('../lib/utils').tmpDir;
+const { tmpDir, getLatestTag, objectToString, resolveRepoUrl } = require('../lib/utils');
 
 if (semver.satisfies(process.version, pkg.engines.node) === false) {
-    logger.fatal(`Your current version of Node.js doesn't satisfy the minimun requirement: ${pkg.engines.node}`);
-    return;
+    logger.fatal(`[create] Your current version of Node.js doesn't satisfy the minimun requirement: ${pkg.engines.node}`);
+    process.exit(1);
 }
 
 /**
@@ -38,17 +38,17 @@ program
  */
 
 program.on('--help', () => {
-    console.log('  Examples:');
-    console.log();
-    console.log(chalk.gray('    # create a barebone, no library project'));
-    console.log('    $ umeboshi create base my-project');
-    console.log();
-    console.log(chalk.gray('    # create a React project'));
-    console.log('    $ umeboshi create react my-project');
-    console.log();
-    console.log(chalk.gray('    # create a new project straight from a github template'));
-    console.log('    $ umeboshi create username/repo my-project');
-    console.log();
+    logger.log('  Examples:');
+    logger.log();
+    logger.log(chalk.gray('    # create a barebone, no library project'));
+    logger.log('    $ umeboshi create base my-project');
+    logger.log();
+    logger.log(chalk.gray('    # create a React project'));
+    logger.log('    $ umeboshi create react my-project');
+    logger.log();
+    logger.log(chalk.gray('    # create a new project straight from a github template'));
+    logger.log('    $ umeboshi create username/repo my-project');
+    logger.log();
 });
 
 program.parse(process.argv);
@@ -62,7 +62,7 @@ if (!program.verbose && Number.isFinite(program.logLevel)) {
     logger.setLevel(0);
 }
 
-logger.verbose(`Program started with arguments: ${program.args.join(', ')}`);
+logger.verbose(`[create] Program started with arguments: ${program.args.join(', ')}`);
 
 
 /**
@@ -70,7 +70,7 @@ logger.verbose(`Program started with arguments: ${program.args.join(', ')}`);
  */
 
 const template = program.args[0];
-const [match, templateName = 'base', version = 'master'] = template.match(/^([^#]+)#?(master|develop|[0-9.]+|)$/) || [];
+const [match, templateName = 'base', version] = template.match(/^([^#]+)#?(master|develop|[0-9.]+|)$/) || [];
 const hasSlash = templateName.indexOf('/') > -1;
 const isLocal = /^(\.|\/)/.test(template);
 const rawName = program.args[1];
@@ -78,12 +78,56 @@ const inPlace = !rawName || rawName === '.';
 const name = inPlace ? path.relative('../', process.cwd()) : rawName;
 const to = path.resolve(rawName || '.');
 
+const completed = (err) => {
+    if (err) {
+        logger.fatal(`[create] Scaffoling failed: ${err.message.trim()}`);
+        return;
+    }
+    logger.message('[create] Scaffolding completed!\n');
+    logger.log('Next Steps:\n');
+    if (!inPlace) {
+        logger.log(`- cd into the project folder: cd ${rawName}`);
+    }
+    logger.log('- install dependencies: yarn install');
+    logger.log('- launch development env: yarn start\n');
+};
+
 if (fs.existsSync(to) && fs.readdirSync(to).length > 0) {
-    logger.fatal(`path "${to}" already exists and is not empty`);
+    logger.fatal(`[create] path "${to}" already exists and is not empty`);
     return;
 }
 
-logger.verbose(`Path "${to}" is a valid path`);
+const resolveTemplate
+
+
+
+const resolveTemplates = (options = {}) => {
+    const {
+        version,
+        templateName,
+        hasSlash
+    } = options;
+
+    if (hasSlash) {
+        return Promise.all([resolveRepoUrl(templateName, version)]);
+    }
+
+    const promises = [];
+
+    if (templateName !== 'base') {
+        promises.push(
+            resolveRepoUrl('dwightjack/umeboshi-base');
+        );
+    }
+
+    promises.push(
+        resolveRepoUrl(`dwightjack/umeboshi-${templateName}`, version);
+    );
+
+    return Promise.all(promises);
+};
+
+logger.verbose(`[create] Path "${to}" is a valid path`);
 
 inquirer.prompt([
     {
@@ -106,64 +150,53 @@ inquirer.prompt([
     }
 ]).then((answers) => {
 
-    logger.verbose(`Answers - ${objectToString(answers)}`);
+    logger.verbose(`[create] Answers - ${objectToString(answers)}`);
 
     const options = Object.assign({
-        version,
+        version: (version || 'latest'),
         templateName,
         to,
         fullName: answers.name.replace(/(^[a-z]|-[a-z])/ig, (match) => match.toUpperCase()).replace('-', ' '),
-        hasSlash,
-        tmpl: { hmr: false }
+        hasSlash
     }, answers);
-
-
-    const completed = (err) => {
-        if (err) {
-            logger.fatal(`Scaffoling failed: ${err.message.trim()}`);
-            return;
-        }
-        logger.message('Scaffolding completed!\n');
-        logger.log('Next Steps:\n');
-        if (!inPlace) {
-            logger.log(`- cd into the project folder: cd ${rawName}`);
-        }
-        logger.log('- install dependencies: yarn install');
-        logger.log('- launch development env: yarn start\n');
-    };
 
 
     if (isLocal) {
 
         if (fs.existsSync(template)) {
-            logger.verbose('Generating template files...');
+            logger.verbose('[create] Generating template files...');
 
             generate(Object.assign({}, options, {
                 src: template
             }), completed);
-            return;
+            return Promise.resolve(null);
         }
 
-        logger.fatal(`Local folder ${template} not found`);
+        logger.fatal(`[create] Local folder ${template} not found`);
+        return Promise.reject(new Error(`[create] Local folder ${template} not found`));
+    }
+
+    const spinner = ora('resolving templates...');
+    spinner.start();
+
+    return resolveTemplates(options)
+        .then((templates) => {
+            spinner.succeed();
+            return { templates, options };
+        })
+        .catch(() => spinner.fail());
+
+}).then((res) => {
+
+    if (res === null) {
         return;
     }
 
-    const templates = [];
+    const { templates, options } = res;
 
-    if (hasSlash) {
-        templates.push(`github:${templateName}#${version || 'master'}`);
-    } else {
+    const tmpFolder = tmpDir(`${_.last(templates).replace(/[#.]+/g, '')}-${Date.now()}`);
 
-        if (templateName !== 'base') {
-            templates.push('github:dwightjack/umeboshi-base#master');
-        }
-
-        templates.push(`github:dwightjack/umeboshi-${templateName}#${version || 'master'}`);
-    }
-
-    const tmpFolder = tmpDir(`${_.last(templates)}-${Date.now()}`);
-
-    async.eachSeries(templates, (tmplUrl, callback) => {
+        async.eachSeries(templates, (tmplUrl, next) => {
 
             const spinner = ora(`downloading template "${tmplUrl}"`);
             spinner.start();
@@ -172,12 +205,12 @@ inquirer.prompt([
 
                 if (err) {
                     spinner.fail();
-                    logger.fatal(`Failed to download template ${tmplUrl}: ${err.message.trim()}`);
-                    callback(err);
+                    logger.fatal(`[create] Failed to download template ${tmplUrl}: ${err.message.trim()}`);
+                    next(err);
                     return;
                 }
                 spinner.succeed();
-                callback();
+                next();
 
             });
 
@@ -187,11 +220,13 @@ inquirer.prompt([
                 return;
             }
 
-            logger.verbose('Generating template files...');
+            logger.verbose('[create] Generating template files...');
 
             generate(Object.assign({ command: 'create' }, options, {
                 src: tmpFolder
             }), completed);
 
         });
+}).catch((...args) => {
+    logger.fatal(args);
 });
