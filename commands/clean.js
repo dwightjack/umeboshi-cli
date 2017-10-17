@@ -27,11 +27,11 @@ program
  */
 
 program.on('--help', () => {
-    console.log('  Examples:');
-    console.log();
-    console.log(chalk.gray('    # clean up temporary files folder'));
-    console.log('    $ umeboshi clean');
-    console.log();
+    logger.log('  Examples:');
+    logger.log();
+    logger.log(chalk.gray('    # clean up temporary files folder'));
+    logger.log('    $ umeboshi clean');
+    logger.log();
 });
 
 program.parse(process.argv);
