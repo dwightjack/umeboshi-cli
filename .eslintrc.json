@@ -27,6 +27,7 @@
         "import/no-dynamic-require": "off",
         "global-require": "off",
         "eol-last": ["warn", "never"],
-        "max-len": "off"
+        "max-len": "off",
+        "function-paren-newline": "off"
     }
 }
