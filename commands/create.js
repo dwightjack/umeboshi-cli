@@ -177,7 +177,10 @@ inquirer.prompt([
             spinner.succeed();
             return { templates, options };
         })
-        .catch(() => spinner.fail());
+        .catch((err) => {
+            spinner.fail();
+            return Promise.reject(err);
+        });
 
 }).then((res) => {
 
@@ -222,5 +225,6 @@ inquirer.prompt([
     });
 
 }).catch((...args) => {
-    logger.fatal(args);
+    logger.fatal(...args);
+    logger.verbose('[create] Error:', ...args);
 });
