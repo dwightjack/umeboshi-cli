@@ -68,13 +68,17 @@ logger.verbose(`[create] Program started with arguments: ${program.args.join(', 
  */
 
 const template = program.args[0];
-const [, templateName = 'base', version] = template.match(/^([^#]+)#?(master|develop|[0-9.]+|)$/) || [];
+const [, templateName = '', version] = template.match(/^([^#]+)#?(.*)$/) || [];
 const hasSlash = templateName.indexOf('/') > -1;
 const isLocal = /^(\.|\/)/.test(template);
 const rawName = program.args[1];
 const inPlace = !rawName || rawName === '.';
 const name = inPlace ? path.relative('../', process.cwd()) : rawName;
 const to = path.resolve(rawName || '.');
+
+if (templateName === '') {
+    logger.fatal('[create] You must provide a valid <template> argument');
+}
 
 const completed = (err) => {
     if (err) {
