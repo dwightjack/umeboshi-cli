@@ -68,6 +68,14 @@ $ umeboshi scaffold react/stateless
 
 Learn more about `scaffold` [here](docs/scaffold.md)
 
+### `clean`
+
+This command will cleanup cached templates (usually stored under `~/.umeboshi-cli/`).
+
+```sh
+$ umeboshi clean
+```
+
 ## Official Project Templates
 
 Available project templates:
