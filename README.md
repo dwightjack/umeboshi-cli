@@ -19,30 +19,38 @@ $ npm install -g umeboshi-cli
 
 Once installed umeboshi-cli commands are available through the `umeboshi` or `ume` executable.
 
-**Available commands are:**
+#### Available commands:
 
 * `create`: scaffolds a new project based on a remote template
 * `scaffold`: scaffolds project's folders and files based on templates
 * `clean`: deletes locally stored project templates
 
+#### Global options:
+
+* `--verbose`: verbose logging (useful for debugging)
+* `--log-level=n`: where `n` is `0` (verbose), `1` (default), `2` (messages), `3` (warnings), `4` (errors)
+
 ### `create`
 
-This command scaffolds a new project based on a remote template. The target folder must be empty.
+This command scaffolds a new project based on a local or remote template into a target folder.
 
 ```sh
-$ umeboshi create <template> <project-folder|.>
+$ umeboshi create <template> <project-folder|.> [--dry-run]
 ```
 
-Example:
+Examples:
 
 ```sh
 $ umeboshi create base my-project-folder
+
+# process files but don't output anything
+$ umeboshi create base my-project-folder --dry-run
 
 # use the current folder as project root
 $ umeboshi create base .
 ```
 
-_More docs to come..._
+Learn more about `create` [here](docs/create.md)
 
 ### `scaffold`
 
@@ -64,12 +72,12 @@ Learn more about `scaffold` [here](docs/scaffold.md)
 
 Available project templates:
 
-* [Base](https://github.com/dwightjack/umeboshi-template-base)
-* [React](https://github.com/dwightjack/umeboshi-template-react)
-* [Vue.js](https://github.com/dwightjack/umeboshi-template-vue)
+* [Base](https://github.com/dwightjack/umeboshi-template-base) (`ume create base`)
+* [React](https://github.com/dwightjack/umeboshi-template-react) (`ume create react`)
+* [Vue.js](https://github.com/dwightjack/umeboshi-template-vue) (`ume create vue`)
 
 ## License
 
 [MIT](http://opensource.org/licenses/MIT)
 
-Copyright (c) 2016 Marco Solazzi
+Copyright (c) 2016-2017 Marco Solazzi
