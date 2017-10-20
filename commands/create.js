@@ -94,7 +94,7 @@ if (fs.existsSync(to) && fs.readdirSync(to).length > 0) {
     logger.fatal(`[create] path "${to}" already exists and is not empty`);
 }
 
-const resolveTemplates = (options = {}) => {
+const resolveTemplate = (options = {}) => {
     const {
         version, //eslint-disable-line no-shadow
         templateName, //eslint-disable-line no-shadow
@@ -102,22 +102,10 @@ const resolveTemplates = (options = {}) => {
     } = options;
 
     if (hasSlash) {
-        return Promise.all([resolveRepoUrl(templateName, version)]);
+        return resolveRepoUrl(templateName, version);
     }
 
-    const promises = [];
-
-    if (templateName !== 'base') {
-        promises.push(
-            resolveRepoUrl('dwightjack/umeboshi-base')
-        );
-    }
-
-    promises.push(
-        resolveRepoUrl(`dwightjack/umeboshi-${templateName}`, version)
-    );
-
-    return Promise.all(promises);
+    return resolveRepoUrl(`dwightjack/umeboshi-template-${templateName}`, version);
 };
 
 logger.verbose(`[create] Path "${to}" is a valid path`);
@@ -172,10 +160,10 @@ inquirer.prompt([
     const spinner = ora('resolving templates...');
     spinner.start();
 
-    return resolveTemplates(options)
-        .then((templates) => {
+    return resolveTemplate(options)
+        .then((templateUrl) => {
             spinner.succeed();
-            return { templates, options };
+            return { templateUrl, options };
         })
         .catch((err) => {
             spinner.fail();
@@ -188,33 +176,23 @@ inquirer.prompt([
         return;
     }
 
-    const { templates, options } = res;
+    const { templateUrl, options } = res;
 
-    const tmpFolder = tmpDir(`${_.last(templates).replace(/[#.]+/g, '')}-${Date.now()}`);
+    const tmpFolder = tmpDir(`${templateUrl.replace(/[#.]+/g, '')}`);
 
-    async.eachSeries(templates, (tmplUrl, next) => {
+    const spinner = ora(`downloading template "${templateUrl}"`);
+    spinner.start();
 
-        const spinner = ora(`downloading template "${tmplUrl}"`);
-        spinner.start();
+    download(templateUrl, tmpFolder, { clone: false }, (err) => {
 
-        download(tmplUrl, tmpFolder, { clone: false }, (err) => {
-
-            if (err) {
-                spinner.fail();
-                logger.fatal(`[create] Failed to download template ${tmplUrl}: ${err.message.trim()}`);
-                next(err);
-                return;
-            }
-            spinner.succeed();
-            next();
-
-        });
-
-    }, (err) => {
         if (err) {
+            spinner.fail();
+            logger.fatal(`[create] Failed to download template ${templateUrl}: ${err.message.trim()}`);
             completed(err);
             return;
         }
+
+        spinner.succeed();
 
         logger.verbose('[create] Generating template files...');
 

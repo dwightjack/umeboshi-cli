@@ -64,9 +64,9 @@ Learn more about `scaffold` [here](docs/scaffold.md)
 
 Available project templates:
 
-* [Base](https://github.com/dwightjack/umeboshi-base)
-* [React](https://github.com/dwightjack/umeboshi-react)
-* [Vue.js](https://github.com/dwightjack/umeboshi-vue)
+* [Base](https://github.com/dwightjack/umeboshi-template-base)
+* [React](https://github.com/dwightjack/umeboshi-template-react)
+* [Vue.js](https://github.com/dwightjack/umeboshi-template-vue)
 
 ## License
 
