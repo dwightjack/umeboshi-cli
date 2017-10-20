@@ -63,7 +63,6 @@ ume create base#3.1.2 my-folder
 # target tag 3.1.2
 ```
 
-
 ## Template authoring guidelines
 
 Every template is made up of:
