@@ -178,29 +178,39 @@ inquirer.prompt([
 
     const { templateUrl, options } = res;
 
-    const tmpFolder = tmpDir(`${templateUrl.replace(/[#.]+/g, '')}`);
+    const tmpFolder = tmpDir(templateUrl.replace(/[#.]+/g, ''));
 
-    const spinner = ora(`downloading template "${templateUrl}"`);
-    spinner.start();
-
-    download(templateUrl, tmpFolder, { clone: false }, (err) => {
-
-        if (err) {
-            spinner.fail();
-            logger.fatal(`[create] Failed to download template ${templateUrl}: ${err.message.trim()}`);
-            completed(err);
-            return;
-        }
-
-        spinner.succeed();
-
+    const generateCallback = () => {
         logger.verbose('[create] Generating template files...');
 
         generate(Object.assign({ command: 'create' }, options, {
             src: tmpFolder
         }), completed);
+    };
 
-    });
+    if (fs.existsSync(tmpFolder)) {
+        logger.verbose(`[create] Local template copy found at ${tmpFolder}`);
+        generateCallback();
+
+    } else {
+        const spinner = ora(`downloading template "${templateUrl}"`);
+        spinner.start();
+
+        download(templateUrl, tmpFolder, { clone: false }, (err) => {
+
+            if (err) {
+                spinner.fail();
+                logger.fatal(`[create] Failed to download template ${templateUrl}: ${err.message.trim()}`);
+                completed(err);
+                return;
+            }
+
+            spinner.succeed();
+            generateCallback();
+        });
+    }
+
+
 
 }).catch((...args) => {
     logger.fatal(...args);
