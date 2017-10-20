@@ -3,7 +3,6 @@ const path = require('path');
 
 const _ = require('lodash');
 const download = require('download-git-repo');
-const async = require('async');
 const program = require('commander');
 const ora = require('ora');
 const semver = require('semver');
@@ -28,6 +27,7 @@ program
     .version(pkg.version)
     .usage('<template> [options]')
     .option('--verbose', 'Verbose output')
+    .option('--dry-run', 'Don\'t write files into the destination folder')
     .option('--log-level <n>', `Log levels: ${logger.asString()}`, parseInt);
 
 /**
@@ -114,6 +114,10 @@ const resolveTemplate = (options = {}) => {
 
 logger.verbose(`[create] Path "${to}" is a valid path`);
 
+if (program.dryRun) {
+    logger.verbose('[create] DRY RUN!');
+}
+
 inquirer.prompt([
     {
         type: 'input',
@@ -140,6 +144,7 @@ inquirer.prompt([
     const options = Object.assign({
         version: (version || 'latest'),
         templateName,
+        dryRun: program.dryRun || false,
         to,
         fullName: answers.name.replace(/(^[a-z]|-[a-z])/ig, (match) => match.toUpperCase()).replace('-', ' '),
         hasSlash
