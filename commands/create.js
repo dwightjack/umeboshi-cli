@@ -109,7 +109,7 @@ const resolveTemplate = (options = {}) => {
         return resolveRepoUrl(templateName, version);
     }
 
-    return resolveRepoUrl(`dwightjack/umeboshi-template-${templateName}`, version);
+    return resolveRepoUrl(`github:dwightjack/umeboshi-template-${templateName}`, version);
 };
 
 logger.verbose(`[create] Path "${to}" is a valid path`);
@@ -187,7 +187,7 @@ inquirer.prompt([
 
     const { templateUrl, options } = res;
 
-    const tmpFolder = tmpDir(templateUrl.replace(/[#.]+/g, ''));
+    const tmpFolder = tmpDir(templateUrl.replace(/[#:/]+/g, '-').replace(/\./g, ''));
 
     const generateCallback = () => {
         logger.verbose('[create] Generating template files...');
@@ -221,7 +221,7 @@ inquirer.prompt([
 
 
 
-}).catch((...args) => {
-    logger.fatal(...args);
-    logger.verbose('[create] Error:', ...args);
+}).catch((e) => {
+    logger.verbose('[create] Original error:', e);
+    logger.fatal(e);
 });

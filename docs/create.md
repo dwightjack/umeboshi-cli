@@ -20,8 +20,8 @@ $ umeboshi create <template-name> <folder>|. [--dry-run]
 A project scaffolding template could be:
 
 1) an [official umeboshi template](../README.md#official-project-templates)
-1) a custom template from a GitHub repository
-1) a _plain_ GitHub repository (will just copy the repository)
+1) a custom template from a GitHub or Bitbucket repository
+1) a _plain_ GitHub or Bitbucket repository (will just copy the repository)
 1) a path to a local folder (starting with `.` or `/`)
 
 
@@ -33,6 +33,12 @@ ume create base my-folder
 
 ume create user/custom-umeboshi-template my-folder
 # resolves to github.com/user/custom-umeboshi-template
+
+ume create github:user/custom-umeboshi-template my-folder
+# resolves to github.com/user/custom-umeboshi-template
+
+ume create bitbucket:user/custom-umeboshi-template my-folder
+# resolves to bitbucket.org/user/custom-umeboshi-template
 
 ume create user/my-repo my-folder
 # resolves to plain repository github.com/user/my-repo
