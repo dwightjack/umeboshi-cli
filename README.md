@@ -1,6 +1,6 @@
 # umeboshi-cli
 
-> simple project sacaffolding for SPA applications, inspired by [vue-cli](https://github.com/vuejs/vue-cli)
+> simple project scaffolding for SPA applications, inspired by [vue-cli](https://github.com/vuejs/vue-cli)
 
 ## Requirements
 
