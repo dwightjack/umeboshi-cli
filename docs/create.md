@@ -28,8 +28,8 @@ A project scaffolding template could be:
 Examples:
 
 ```sh
-ume create base my-folder
-# resolves to github.com/dwightjack/umeboshi-template-base
+ume create webpack my-folder
+# resolves to github.com/dwightjack/umeboshi-template-webpack
 
 ume create user/custom-umeboshi-template my-folder
 # resolves to github.com/user/custom-umeboshi-template
@@ -56,16 +56,16 @@ By default resolves to the latest valid tag version number or `master`.
 Examples:
 
 ```sh
-ume create base#master my-folder
+ume create webpack#master my-folder
 # master branch
 
-ume create base#3 my-folder
+ume create webpack#3 my-folder
 # target tags >= 3.0.0 < 4.0.0
 
-ume create base#^3.1.0 my-folder
+ume create webpack#^3.1.0 my-folder
 # target tags >= 3.1.0 < 3.2.0
 
-ume create base#3.1.2 my-folder
+ume create webpack#3.1.2 my-folder
 # target tag 3.1.2
 ```
 
