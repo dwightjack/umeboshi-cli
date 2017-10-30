@@ -80,9 +80,7 @@ $ umeboshi clean
 
 Available project templates:
 
-* [Base](https://github.com/dwightjack/umeboshi-template-base) (`ume create base`)
-* [React](https://github.com/dwightjack/umeboshi-template-react) (`ume create react`)
-* [Vue.js](https://github.com/dwightjack/umeboshi-template-vue) (`ume create vue`)
+* [Webpack](https://github.com/dwightjack/umeboshi-template-webpack) (`ume create webpack`)
 
 ## License
 
