@@ -1,6 +1,6 @@
 {
   "name": "umeboshi-cli",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "description": "Umeboshi Scaffolding CLI",
   "main": "lib/index.js",
   "repository": "git@github.com:dwightjack/umeboshi-cli.git",
@@ -21,25 +21,29 @@
     "node": ">=6.9.0"
   },
   "devDependencies": {
-    "eslint": "4.3.0",
-    "eslint-config-airbnb-base": "11.3.1",
+    "eslint": "4.9.0",
+    "eslint-config-airbnb-base": "12.1.0",
     "eslint-plugin-import": "2.7.0"
   },
   "dependencies": {
     "async": "2.5.0",
-    "chalk": "2.0.1",
+    "chalk": "2.1.0",
     "commander": "2.11.0",
     "consolidate": "0.14.5",
     "download-git-repo": "1.0.1",
     "handlebars": "4.0.10",
-    "handlebars-helpers": "0.9.6",
+    "handlebars-helpers": "0.9.8",
     "inquirer": "3.2.1",
     "lodash": "4.17.4",
     "metalsmith": "2.3.0",
     "minimatch": "3.0.4",
+    "npm-package-arg": "5.1.2",
     "ora": "1.3.0",
+    "registry-url": "3.1.0",
+    "request": "2.83.0",
     "rimraf": "^2.6.1",
     "semver": "5.4.1",
+    "update-notifier": "2.3.0",
     "user-home": "2.0.0"
   }
 }

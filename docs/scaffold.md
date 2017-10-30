@@ -6,7 +6,7 @@ Command signature:
 $ umeboshi scaffold <namespace>[/<template-name>]
 ```
 
-Project's templates are stored locally. Template resolution order:
+Project's templates must stored locally either as user template or npm modules. Template resolution order:
 
 * `scaffold/<namespace>[/<template-name>]` folder in the project root
 * `umeboshi-scaffold-<namespace>[/<template-name>]` local npm module
@@ -53,7 +53,7 @@ Templates are stored in a `umeboshi-scaffold-<namespace>[/<template-name>]` tree
 
 Every template is made up of:
 
-* a `template` folder containing the files and folders to scaffolding
+* a `template` folder containing the files and folders to scaffold
 * an optional `index.js` entry point that will be read by umeboshi and used to submit prompts to the user and alter / rename scaffolded files.
 
 
@@ -128,7 +128,7 @@ Receives an object with the following properties:
 
 #### `fileMaps({ utils, logger, options })`
 
-A function that returns an array of rename patterns. This middleware is executed **after** `afterRender`. Defaults to `() => []`.
+A function that returns an array of rename patterns. The associated middleware is executed **after** `afterRender`. Defaults to `() => []`.
 
 Receives an object with the following properties:
 

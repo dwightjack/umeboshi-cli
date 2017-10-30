@@ -91,5 +91,5 @@ log
 ############
 ## Misc
 ############
-
+.vscode
 node_modules
