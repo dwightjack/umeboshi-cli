@@ -37,11 +37,11 @@ program
 program.on('--help', () => {
     logger.log('  Examples:');
     logger.log();
-    logger.log(chalk.gray('    # create a barebone, no library project'));
-    logger.log('    $ umeboshi create base my-project');
+    logger.log(chalk.gray('    # create a project from the official webpack template'));
+    logger.log('    $ umeboshi create webpack my-project');
     logger.log();
-    logger.log(chalk.gray('    # create a React project'));
-    logger.log('    $ umeboshi create react my-project');
+    logger.log(chalk.gray('    # create a project from a local folder'));
+    logger.log('    $ umeboshi create ./my-local-template my-project');
     logger.log();
     logger.log(chalk.gray('    # create a new project straight from a github template'));
     logger.log('    $ umeboshi create username/repo my-project');
