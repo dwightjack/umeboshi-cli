@@ -1,6 +1,6 @@
 {
   "name": "umeboshi-cli",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "Umeboshi Scaffolding CLI",
   "main": "lib/index.js",
   "repository": "git@github.com:dwightjack/umeboshi-cli.git",
