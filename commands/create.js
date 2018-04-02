@@ -190,11 +190,21 @@ inquirer.prompt([
     const tmpFolder = tmpDir(templateUrl.replace(/[#:/]+/g, '-').replace(/\./g, ''));
 
     const generateCallback = () => {
+        const spinner = ora('Generating files...');
+        spinner.start();
+
         logger.verbose('[create] Generating template files...');
 
         generate(Object.assign({ command: 'create' }, options, {
             src: tmpFolder
-        }), completed);
+        }), (err) => {
+            completed(err);
+            if (err) {
+                spinner.fail();
+            } else {
+                spinner.succeed();
+            }
+        });
     };
 
     if (fs.existsSync(tmpFolder)) {
